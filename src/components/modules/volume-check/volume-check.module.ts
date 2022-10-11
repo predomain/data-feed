@@ -388,7 +388,7 @@ export class VolumeCheckModule implements ModuleBase {
     });
     return collected
       .map((c) => {
-        return { domain: c.domain, price: c.price };
+        return { domain: c.domain, price: c.price, timestamp: c.timestamp };
       })
       .sort((a, b) => {
         return b.price - a.price;
