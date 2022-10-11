@@ -403,10 +403,10 @@ export class VolumeCheckModule implements ModuleBase {
     });
     return collected
       .map((c) => {
-        return { domain: c.domain, price: c.price, timestap: c.timestamp };
+        return { domain: c.domain, price: c.price, timestamp: c.timestamp };
       })
       .sort((a, b) => {
-        return b.timestap - a.timestap;
+        return b.timestamp - a.timestamp;
       })
       .slice(0, volumeCheckConf.maxRecentSales);
   }

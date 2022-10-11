@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 export const generalConfigurations = {
   serverLocale: "en-gb",
-  serverPort: 80,
+  serverPort: 443,
   processorThreads: 100,
   dropConnectionAfterMs: 1000,
   maxConnections: 100,
