@@ -1,0 +1,13 @@
+export enum RouteParametersEnum {
+  STRING,
+  HASH,
+  DECIMAL,
+  INTEGER,
+  DECIMAL_OR_INTEGER,
+  JSON_STRING,
+  CURRENCY,
+  SERIAL,
+  WALLET_ADDRESS,
+  CURRENCIES,
+  BOOLEAN,
+}

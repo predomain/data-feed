@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "allowJs": true,
+  "compilerOptions": {
+    "module": "CommonJS",
+    "esModuleInterop": false,
+    "target": "ES6",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": [".node_modules/@types"],
+    "outDir": "./dist",
+    "paths": {
+      "src": ["./src"]
+    },
+    "types": ["node"],
+    "downlevelIteration": true,
+    "declaration": false,
+    "allowJs": true,
+    "lib": ["es2021", "dom", "es6", "dom.iterable"]
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
+  "include": ["/**/*.ts"],
+  "exclude": ["node_modules", "./node_modules/**/*"],
+  "allowSyntheticDefaultImports": true
+}
