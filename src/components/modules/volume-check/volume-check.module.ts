@@ -86,7 +86,18 @@ export class VolumeCheckModule implements ModuleBase {
                 })
               );
           }
-          return of([true, r[0]]);
+          return this.sqlService
+            .update(
+              "root_volume",
+              { id: "root_volume" },
+              { $set: volumeCheckConf.rootVolumeDataFigure },
+              true
+            )
+            .pipe(
+              switchMap((ir) => {
+                return of([ir, volumeCheckConf.rootVolumeDataFigure]);
+              })
+            );
         }),
         map((r) => {
           const [retrieveSucceded, dataFiguers] = r;
@@ -251,6 +262,8 @@ export class VolumeCheckModule implements ModuleBase {
                 const topSales = this.sortTopSales(c);
                 const recentSales = this.sortRecentSales(c);
                 const categoriesVolumes = this.sortCategoriesVolumes(c);
+                const categoriesVolumesMonthly =
+                  this.sortCategoriesVolumesMonthly(c);
                 return this.sqlService.update(
                   "root_volume",
                   { id: "root_volume" },
@@ -260,6 +273,7 @@ export class VolumeCheckModule implements ModuleBase {
                       top_sales: topSales,
                       recent_sales: recentSales,
                       categories_daily_volume: categoriesVolumes,
+                      categories_monthly_volume: categoriesVolumesMonthly,
                     },
                   }
                 );
@@ -313,14 +327,14 @@ export class VolumeCheckModule implements ModuleBase {
             trackingTime.type === TaskTimingEnum.HOURLY
               ? c.volume.hourly_volume
               : c.volume.previous_hourly_volume;
-          toUpdateQuery.volume.previous_daily_volume =
-            trackingTime.type === TaskTimingEnum.DAILY
-              ? c.volume.daily_volume
-              : c.volume.previous_daily_volume;
           toUpdateQuery.volume.previous_hourly_sales =
             trackingTime.type === TaskTimingEnum.HOURLY
               ? c.volume.hourly_sales
               : c.volume.previous_hourly_sales;
+          toUpdateQuery.volume.previous_daily_volume =
+            trackingTime.type === TaskTimingEnum.DAILY
+              ? c.volume.daily_volume
+              : c.volume.previous_daily_volume;
           toUpdateQuery.volume[trackingTime.type] =
             this.taskTracking[trackingTime.type];
           toUpdateQuery.volume.sales = this.filterExpiredSalesFromLog(
@@ -361,9 +375,76 @@ export class VolumeCheckModule implements ModuleBase {
   }
 
   sortCategoriesVolumes(collections: CategoryDataModel[]) {
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const nextDay = startOfDay.getTime() + 86400000;
     return collections
       .map((c) => {
-        return { category: c.category, volume: c["volume"]["daily_volume"] };
+        return {
+          category: c.category,
+          qualifiedSales:
+            c["volume"]["sales"] === null
+              ? []
+              : c["volume"]["sales"].filter((s) => {
+                  if (
+                    s.timestamp > startOfDay.getTime() &&
+                    s.timestamp < nextDay
+                  ) {
+                    return true;
+                  }
+                  return false;
+                }),
+        };
+      })
+      .map((c) => {
+        return {
+          category: c.category,
+          volume:
+            c.qualifiedSales.length <= 0
+              ? 0
+              : c.qualifiedSales
+                  .map((s) => (s as any).price)
+                  .reduce((p, a) => parseFloat(p) + parseFloat(a), 0),
+        };
+      })
+      .sort((a, b) => {
+        return b.volume - a.volume;
+      });
+  }
+
+  sortCategoriesVolumesMonthly(collections: CategoryDataModel[]) {
+    const date = new Date();
+    const startOfMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).getTime();
+    const nextMonth = startOfMonth + 86400000 * 30;
+    return collections
+      .map((c) => {
+        return {
+          category: c.category,
+          qualifiedSales:
+            c["volume"]["sales"] === null || c["volume"]["sales"] === undefined
+              ? []
+              : c["volume"]["sales"].filter((s) => {
+                  if (s.timestamp > startOfMonth && s.timestamp < nextMonth) {
+                    return true;
+                  }
+                  return false;
+                }),
+        };
+      })
+      .map((c) => {
+        return {
+          category: c.category,
+          volume:
+            c.qualifiedSales.length <= 0
+              ? 0
+              : c.qualifiedSales
+                  .map((s) => (s as any).price)
+                  .reduce((p, a) => parseFloat(p) + parseFloat(a), 0),
+        };
       })
       .sort((a, b) => {
         return b.volume - a.volume;
@@ -371,9 +452,39 @@ export class VolumeCheckModule implements ModuleBase {
   }
 
   sortTopCategories(collections: CategoryDataModel[]) {
+    const date = new Date();
+    const startOfMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).getTime();
+    const nextMonth = startOfMonth + 86400000 * 30;
     return collections
       .map((c) => {
-        return { category: c.category, volume: c["volume"]["daily_volume"] };
+        return {
+          category: c.category,
+          qualifiedSales:
+            c["volume"]["sales"] === null || c["volume"]["sales"] === undefined
+              ? []
+              : c["volume"]["sales"].filter((s) => {
+                  if (s.timestamp > startOfMonth && s.timestamp < nextMonth) {
+                    return true;
+                  }
+                  return false;
+                }),
+        };
+      })
+      .map((c) => {
+        return {
+          category: c.category,
+          volume:
+            c.qualifiedSales.length <= 0
+              ? 0
+              : c.qualifiedSales
+
+                  .map((s) => (s as any).price)
+                  .reduce((p, a) => parseFloat(p) + parseFloat(a), 0),
+        };
       })
       .sort((a, b) => {
         return b.volume - a.volume;
@@ -382,11 +493,29 @@ export class VolumeCheckModule implements ModuleBase {
   }
 
   sortTopSales(collections: CategoryDataModel[]) {
+    const date = new Date();
+    const startOfMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).getTime();
+    const nextMonth = startOfMonth + 86400000 * 30;
+
     let collected = [];
     collections.map((c) => {
-      collected = collected.concat(c["volume"]["sales"]);
+      collected = collected.concat(
+        c["volume"]["sales"] === null || c["volume"]["sales"] === undefined
+          ? []
+          : c["volume"]["sales"]
+      );
     });
     return collected
+      .filter((s) => {
+        if (s.timestamp > startOfMonth && s.timestamp < nextMonth) {
+          return true;
+        }
+        return false;
+      })
       .map((c) => {
         return { domain: c.domain, price: c.price, timestamp: c.timestamp };
       })

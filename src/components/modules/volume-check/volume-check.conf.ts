@@ -17,9 +17,9 @@ export const volumeCheckConf = {
       minutely_volume: 0,
       previous_hourly_sales: 0,
       hourly_volume: 0,
-      previous_daily_volume: 0,
-      daily_volume: 0,
       previous_hourly_volume: 0,
+      daily_volume: 0,
+      previous_daily_volume: 0,
       hourly_sales: 0,
       sales: [],
     },
@@ -30,5 +30,6 @@ export const volumeCheckConf = {
     top_sales: [],
     recent_sales: [],
     categories_daily_volume: [],
+    categories_monthly_volume: [],
   },
 };
