@@ -687,7 +687,7 @@ export class VolumeCheckModule implements ModuleBase {
             resultAssessed++;
             const n = this.domainsService.getDataSourceIdFromName(
               sale.domain,
-              sale.id,
+              sale.hash,
               cc as any
             );
             if (n !== false && category === false) {

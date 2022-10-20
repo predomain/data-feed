@@ -68,7 +68,7 @@ export class MiscService {
   }
 
   testEmoji() {
-    const reg = new RegExp(/\p{Extended_Pictographic}/u);
+    const reg = new RegExp(/\p{Extended_Pictographic}{1,1000}/u);
     return reg;
   }
 
