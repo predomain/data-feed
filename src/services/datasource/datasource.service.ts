@@ -58,6 +58,9 @@ export class DataSourceService {
     const trackingSchema = Object.values(TaskTimingEnum);
     Modules.map((m) => {
       const modulePrototype = m.module;
+      if (modulePrototype.prototype.moduleDbSchema === null) {
+        return;
+      }
       additionalSchema[modulePrototype.prototype.moduleDbSchema.key] = {
         ...modulePrototype.prototype.moduleDbSchema.figures,
         ...{

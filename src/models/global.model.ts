@@ -25,6 +25,7 @@ export interface GlobalModel extends Global {
       sqlService: SQLService;
       requestValidationService: RequestValidationService;
     };
+    modules: any[];
     tasksInQueue: number;
   };
 }

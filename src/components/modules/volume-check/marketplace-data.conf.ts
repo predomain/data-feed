@@ -21,6 +21,9 @@ const openSeaBulkPriceDiscovery = (
         l.topics[0].toLowerCase() !==
           volumeCheckConf.ensTransferTopicIndicator.toLowerCase()
     );
+    if ((validSaleLog[0].data.length - 2) / 64 > 20) {
+      throw false;
+    }
     const dataDecoded = ethers.utils.defaultAbiCoder.decode(
       SeaportABI as any,
       validSaleLog[0].data
@@ -38,7 +41,6 @@ const openSeaBulkPriceDiscovery = (
       .div(100);
     return ethers.BigNumber.from(consideration[0]).add(feeAdded);
   } catch (e) {
-    console.log(e);
     return false;
   }
 };
@@ -67,7 +69,6 @@ const looksRareBulkPriceDiscovery = (
       .div(100);
     return ethers.BigNumber.from(dataDecoded.price).add(feeAdded);
   } catch (e) {
-    console.log(e);
     return false;
   }
 };
@@ -101,7 +102,6 @@ const x2y2BulkPriceDiscovery = (
       .div(100);
     return ethers.BigNumber.from(dataDecoded.amount).add(feeAdded);
   } catch (e) {
-    console.log(e);
     return false;
   }
 };

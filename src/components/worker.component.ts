@@ -1,5 +1,8 @@
 import { filter, forkJoin, interval, map, mergeMap } from "rxjs";
 import { Modules } from "src/configurations/modules.conf";
+import { GlobalModel } from "src/models/global.model";
+
+const globalAny: GlobalModel = global as any;
 
 export class WorkerComponent {
   moduleInstances: any[] = [];
@@ -10,6 +13,7 @@ export class WorkerComponent {
       module.start();
       this.moduleInstances.push(module);
     }
+    globalAny.predomain.modules = this.moduleInstances;
   }
 
   get modules() {

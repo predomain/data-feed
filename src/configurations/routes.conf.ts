@@ -13,4 +13,9 @@ export const Routes = [
     route: ["checkout", ":collection", ":figure_key"],
     routeParameters: [RouteParametersEnum.STRING, RouteParametersEnum.STRING],
   } as RouteModel,
+  {
+    routeId: RoutesEnum.CHECKOUT,
+    route: ["paged_checkout", ":collection", ":figure_key", ":object", ":page"],
+    routeParameters: [RouteParametersEnum.STRING, RouteParametersEnum.STRING],
+  } as RouteModel,
 ];

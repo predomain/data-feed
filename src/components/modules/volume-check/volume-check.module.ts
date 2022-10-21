@@ -178,7 +178,7 @@ export class VolumeCheckModule implements ModuleBase {
   performTask() {
     return of(true).pipe(
       filter((r) => {
-        if (this.taskLock === true && this.sqlService.isDBReady === false) {
+        if (this.taskLock === true || this.sqlService.isDBReady === false) {
           return false;
         }
         this.taskLock = true;
@@ -592,7 +592,10 @@ export class VolumeCheckModule implements ModuleBase {
 
   assessSale(filterData, txData: any, domainData: EnsDomainModel) {
     try {
-      if (domainData.registrations[0].labelName === null) {
+      if (
+        domainData.registrations[0].labelName === undefined ||
+        domainData.registrations[0].labelName === null
+      ) {
         throw "Domain metadata resolution failed.";
       }
       const domainName = domainData.registrations[0].labelName;
@@ -658,7 +661,10 @@ export class VolumeCheckModule implements ModuleBase {
         id: domainId,
         hashRaw: domainHash,
         hash: ethers.BigNumber.from(domainHash).toString(),
-        timestamp: new Date().getTime(),
+        timestamp:
+          "timestamp" in txData === true
+            ? txData.timestamp
+            : new Date().getTime(),
       } as SaleDiscoveredModel;
       return newSale;
     } catch (e) {
@@ -666,7 +672,7 @@ export class VolumeCheckModule implements ModuleBase {
     }
   }
 
-  assessSaleCategory(sale: SaleDiscoveredModel) {
+  assessSaleCategory(sale: SaleDiscoveredModel, noSave = false) {
     let category: boolean | string = false;
     return this.sqlService.findAll("collections").pipe(
       switchMap((r) => {
@@ -713,6 +719,9 @@ export class VolumeCheckModule implements ModuleBase {
       switchMap((r) => {
         if (r === false) {
           return of(false);
+        }
+        if (noSave === true) {
+          return of(true);
         }
         return this.sqlService.update(
           "collections",
