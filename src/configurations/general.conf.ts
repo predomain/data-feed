@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 export const generalConfigurations = {
   serverLocale: "en-gb",
-  serverPort: 42069,
+  serverPort: 443,
   processorThreads: 100,
   dropConnectionAfterMs: 1000,
   maxConnections: 100,
@@ -57,9 +57,6 @@ export const generalConfigurations = {
   dataCollectionSource: "categories",
   dataSourceId:
     "0x3af83f519dc6c880d605acff8fe6be6f414d7c94015ed09bfec5cc00d1c33802",
-  provider: new ethers.providers.AlchemyProvider(
-    "homestead",
-    "66Ej1PxypiGJNU5FKz99N6rEEdJnWMEc"
-  ),
+  provider: null,
   ensGraphAPI: "https://api.thegraph.com/subgraphs/name/ensdomains/ens",
 };
